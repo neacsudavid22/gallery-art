@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:3000/api/art';
+const BASE_URL = import.meta.env.VITE_API_URL + '/api/art';
 
 // Get all artworks by style
 export const getArtByStyle = async (style) => {
