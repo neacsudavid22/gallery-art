@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import { AppDataSource } from './db-connection.js';
 import { artRouter } from './art-routes.js';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path'; 
 
 dotenv.config();
 const app = express();
