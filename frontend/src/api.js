@@ -2,13 +2,19 @@ const BASE_URL = 'http://localhost:3000/api/art';
 
 // Get all artworks by style
 export const getArtByStyle = async (style) => {
-  const res = await fetch(`${BASE_URL}/style/${style}`);
+  const res = await fetch(`${BASE_URL}/style/${style}`,{
+    credentials: 'include',
+    method: 'GET'
+  });
   return await res.json();
 };
 
 // Get one artwork by id
 export const getArtById = async (id) => {
-  const res = await fetch(`${BASE_URL}/${id}`);
+  const res = await fetch(`${BASE_URL}/${id}`,{
+    credentials: 'include',
+    method: 'GET',
+  });
   return await res.json();
 };
 
@@ -16,7 +22,8 @@ export const getArtById = async (id) => {
 export const createArt = async (formData) => {
   const res = await fetch(BASE_URL, {
     method: 'POST',
-    body: formData, // trimite FormData direct (blob + detalii)
+    body: formData, 
+    credentials: 'include'
   });
   return await res.json();
 };
@@ -25,7 +32,8 @@ export const createArt = async (formData) => {
 export const updateArt = async (id, formData) => {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: 'PUT',
-    body: formData
+    body: formData, 
+    credentials: 'include'
   });
   return await res.json();
 };
@@ -33,6 +41,9 @@ export const updateArt = async (id, formData) => {
 
 // Delete artwork
 export const deleteArt = async (id) => {
-  const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' });
+  const res = await fetch(`${BASE_URL}/${id}`, { 
+    method: 'DELETE', 
+    credentials: 'include'
+  });
   return await res.json();
 };
