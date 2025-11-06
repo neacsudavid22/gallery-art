@@ -26,6 +26,6 @@ const __dirname = dirname(__filename);
 
 app.use(express.static(join(__dirname, "../frontend/dist")));
 
-app.get("*", (req, res) => {
+app.use((req, res) => {
   res.sendFile(join(__dirname, "../frontend/dist/index.html"));
 });
