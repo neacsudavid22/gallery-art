@@ -4,7 +4,7 @@ import cors from 'cors';
 import { AppDataSource } from './db-connection.js';
 import { artRouter } from './art-routes.js';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path'; 
+import { dirname, join } from 'path'; 
 
 dotenv.config();
 const app = express();
@@ -19,13 +19,13 @@ AppDataSource.initialize()
 app.use('/api/art', artRouter);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = dirname(__filename);
 
-app.use(express.static(path.join(__dirname, "../frontend/dist")));
+app.use(express.static(join(__dirname, "../frontend/dist")));
 
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+  res.sendFile(join(__dirname, "../frontend/dist/index.html"));
 });
