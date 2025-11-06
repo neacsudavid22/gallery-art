@@ -9,7 +9,14 @@ import { dirname, join } from 'path';
 dotenv.config();
 const app = express();
 
-app.use(cors());
+const corsOptions = {
+  origin: ["https://gallery-art-yqul.onrender.com", "http://localhost:5173"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"], 
+  credentials: true,
+  allowedHeaders: ["Content-Type"]
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 AppDataSource.initialize()
