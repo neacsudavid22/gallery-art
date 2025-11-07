@@ -1,9 +1,29 @@
-# gallery-art
+# Art Gallery Application
 
-A small full-stack gallery application for storing artworks (including images) using a Node.js/Express backend with TypeORM/Oracle and a React + Vite frontend.
+A full-stack web application for managing and displaying artwork collections with machine learning features for image analysis and embeddings.
 
-## Repository layout
+## Features
 
-- `backend/` - Express API, TypeORM configuration and entity (`art-model.js`).
-- `frontend/` - React + Vite UI.
-- `database_setup/` - SQL scripts to create the `art_gallery` table and example CRUD SQL.
+- 🎨 **Artwork Management**: Upload, view, update, and delete artwork entries
+- 🖼️ **Image Handling**: Store and display artwork images
+- 🤖 **ML Features**: 
+  - Automatic image embedding generation using CLIP model
+  - Visual similarity search capabilities
+- 🎭 **Style Categories**: Organize artwork by different artistic styles
+- 📱 **Responsive Design**: Bootstrap-based UI that works on desktop and mobile
+
+## Tech Stack
+
+### Backend
+- Node.js with Express
+- TypeORM for database operations
+- Oracle Database for data storage
+- Multer for file upload handling
+
+### Frontend
+- React + Vite
+- React Bootstrap for UI components
+- React Router for navigation
+- Modern ES6+ JavaScript
+
+###Available at: 
