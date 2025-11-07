@@ -12,8 +12,7 @@ export const ArtSchema = new EntitySchema({
     description: { type: 'clob', nullable: true },
     style: { type: 'varchar', length: 50 },
     image_blob: { type: 'blob', nullable: true },
-    signature: { type: 'varchar', length: 16, nullable: true },
-    embedding: { type: 'json', nullable: true },
+    audio_blob: { type: 'blob', nullable: true },
     upload_date: { type: 'date', default: () => 'SYSDATE' },
   }
 });

@@ -1,11 +1,10 @@
 import express from 'express';
-import multer from 'multer';
 import { AppDataSource } from './db-connection.js';
+import { textToAudioBuffer } from './openai.js';
+import multer from "multer";
 
 const upload = multer({ storage: multer.memoryStorage() });
 const artRouter = express.Router();
-
-// Repository
 const getArtRepo = () => AppDataSource.getRepository('Art');
 
 // CREATE
@@ -21,21 +20,21 @@ artRouter.post('/', upload.single('image_blob'), async (req, res) => {
 
     const repo = getArtRepo();
 
+    const audio_blob = await textToAudioBuffer(description || 'No description provided');
+
     const newArt = repo.create({ 
       title, 
       description, 
       style, 
       author, 
-      year: year ? parseInt(year) : null,
-      image_blob: buffer,    
+      year: year ? parseInt(year) : 1000,
+      image_blob: buffer,
+      audio_blob: audio_blob
     });
     
     const savedArt = await repo.save(newArt);
 
-    res.status(201).json({
-      ...savedArt,
-      image_blob: savedArt.image_blob ? savedArt.image_blob.toString('base64') : null
-    });
+    res.status(201).json(savedArt);
     
   } catch (err) {
     console.error(err);
@@ -43,52 +42,6 @@ artRouter.post('/', upload.single('image_blob'), async (req, res) => {
   }
 });
 
-// READ ALL
-artRouter.get('/', async (req, res) => {
-  try {
-    const arts = await getArtRepo().find();
-    const artsWithBase64 = arts.map(a => ({
-      ...a,
-      image_blob: a.image_blob ? a.image_blob.toString('base64') : null
-    }));
-    res.json(artsWithBase64);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// READ BY STYLE
-artRouter.get('/style/:style', async (req, res) => {
-  try {
-    const style = req.params.style;
-    const arts = await getArtRepo().find({ where: { style } });
-    const artsWithBase64 = arts.map(a => ({
-      ...a,
-      image_blob: a.image_blob ? a.image_blob.toString('base64') : null
-    }));
-    res.json(artsWithBase64);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// READ ONE
-artRouter.get('/:id', async (req, res) => {
-  try {
-    const art = await getArtRepo().findOneBy({ id_art: parseInt(req.params.id) });
-    if (!art) return res.status(404).json({ error: 'Art not found' });
-
-    res.json({
-      ...art,
-      image_blob: art.image_blob ? art.image_blob.toString('base64') : null
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
 
 // UPDATE
 artRouter.put('/:id', upload.single('image_blob'), async (req, res) => {
@@ -105,17 +58,69 @@ artRouter.put('/:id', upload.single('image_blob'), async (req, res) => {
     if (author) art.author = author;
     if (year) art.year = parseInt(year);
 
-
     if (req.file) {
-      art.image_blob = req.file.buffer;;
+      const buffer = req.file.buffer;
+      art.image_blob = buffer;
+    }
+    const audio_blob = await textToAudioBuffer(`${art.title}. ${art.author}. ${art.year}. ${art.description}` || 'No description provided');
+    if(audio_blob) {
+      art.audio_blob = audio_blob;
     }
 
     const updatedArt = await repo.save(art);
 
+    res.json(updatedArt);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// READ ALL
+artRouter.get('/', async (req, res) => {
+  try {
+    const arts = await getArtRepo().find();
+    const artsWithBase64 = arts.map(a => ({
+      ...a,
+      image_blob: a.image_blob ? a.image_blob.toString('base64') : null,
+      audio_blob: a.audio_blob ? a.audio_blob.toString('base64') : null, // <-- add this
+    }));
+    res.json(artsWithBase64);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// READ ONE
+artRouter.get('/:id', async (req, res) => {
+  try {
+    const art = await getArtRepo().findOneBy({ id_art: parseInt(req.params.id) });
+    if (!art) return res.status(404).json({ error: 'Art not found' });
+
     res.json({
-      ...updatedArt,
-      image_blob: updatedArt.image_blob ? updatedArt.image_blob.toString('base64') : null
+      ...art,
+      image_blob: art.image_blob ? art.image_blob.toString('base64') : null,
+      audio_blob: art.audio_blob ? art.audio_blob.toString('base64') : null, // <-- add this
     });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// READ BY STYLE
+artRouter.get('/style/:style', async (req, res) => {
+  try {
+    const style = req.params.style;
+    const arts = await getArtRepo().find({ where: { style } });
+    const artsWithBase64 = arts.map(a => ({
+      ...a,
+      image_blob: a.image_blob ? a.image_blob.toString('base64') : null,
+      audio_blob: a.audio_blob ? a.audio_blob.toString('base64') : null
+    }));
+    res.json(artsWithBase64);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });

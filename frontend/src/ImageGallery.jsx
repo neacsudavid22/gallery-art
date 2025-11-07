@@ -32,26 +32,31 @@ const ImageGallery = () => {
     }
   };
 
-  const handleStop = () => {
-    speechSynthesis.cancel();
-  };
+  let audioRef = null;
 
   const handlePlay = (art) => {
-    speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(art.title + ". "+ art.author + ". "+ art.description || 'No description available.');
-
-    const voices = speechSynthesis.getVoices();
-
-    const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
-
-    if (englishVoices.length > 0) {
-      utterance.voice = englishVoices[2];
-    } else {
-      console.warn("No English voice available. Using default.");
+    if (!art.audio_blob) return;
+  
+    const byteCharacters = atob(art.audio_blob);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
-    speechSynthesis.speak(utterance);
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: "audio/mpeg" });
+    const url = URL.createObjectURL(blob);
+  
+    audioRef = new Audio(url);
+    audioRef.play();
   };
- 
+  
+const handleStop = () => {
+  if (audioRef) {
+    audioRef.pause();
+    audioRef.currentTime = 0;
+  }
+};
+
 
   const handleModify = (id) => {
     navigate(`/add-photo/${id}`);
@@ -101,8 +106,8 @@ const ImageGallery = () => {
               <div className="mt-auto" />
 
               <div className="d-flex  justify-content-between mt-3">
-              <Button variant="info" onClick={() => handlePlay(art)}>
-                Play Audio Description
+              <Button variant="info" onClick={() => handlePlay(art)} disabled={!art.audio_blob}>
+                { art.audio_blob ? 'Play Audio Description' : 'No Audio Available' }
               </Button>
               <Button variant="secondary" onClick={handleStop}>
                 Stop Audio
