@@ -10,5 +10,3 @@ CREATE TABLE art_gallery (
     embedding    CLOB,
     upload_date  DATE DEFAULT SYSDATE
 );
-
-DROP TABLE art_gallery;
