@@ -32,25 +32,22 @@ const ImageGallery = () => {
     }
   };
 
-  const handlePlay = (art) => {
-    handleStop();
-    const utterance = new SpeechSynthesisUtterance(art.title + ". "+ art.author + ". "+ art.description || 'No description available.');
-
-    const voices = speechSynthesis.getVoices();
-
-    const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
-
-    if (englishVoices.length > 0) {
-      utterance.voice = englishVoices[2];
-    } else {
-      console.warn("No English voice available. Using default.");
-    }
-    speechSynthesis.speak(utterance);
-  };
-
   const handleStop = () => {
     speechSynthesis.cancel();
   };
+
+  const handlePlay = (art) => {
+    speechSynthesis.cancel();
+    const text = `${art.title || 'Untitled'}. ${art.author || 'Unknown'}. ${art.description || 'No description available.'}`;
+    const utterance = new SpeechSynthesisUtterance(text);
+  
+    const voices = speechSynthesis.getVoices();
+    const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
+    utterance.voice = englishVoices[2] || voices[0] || null;
+  
+    speechSynthesis.speak(utterance);
+  };
+ 
 
   const handleModify = (id) => {
     navigate(`/add-photo/${id}`);
