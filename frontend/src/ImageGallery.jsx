@@ -38,13 +38,17 @@ const ImageGallery = () => {
 
   const handlePlay = (art) => {
     speechSynthesis.cancel();
-    const text = `${art.title || 'Untitled'}. ${art.author || 'Unknown'}. ${art.description || 'No description available.'}`;
-    const utterance = new SpeechSynthesisUtterance(text);
-  
+    const utterance = new SpeechSynthesisUtterance(art.title + ". "+ art.author + ". "+ art.description || 'No description available.');
+
     const voices = speechSynthesis.getVoices();
+
     const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
-    utterance.voice = englishVoices[2] || voices[0] || null;
-  
+
+    if (englishVoices.length > 0) {
+      utterance.voice = englishVoices[2];
+    } else {
+      console.warn("No English voice available. Using default.");
+    }
     speechSynthesis.speak(utterance);
   };
  
@@ -93,17 +97,19 @@ const ImageGallery = () => {
                       <small className="text-muted">ID: {art.id_art}</small>
                     </Card.Text>
                   </div>
-                  <div className="d-flex gap-2 mt-3">
-                    <Button variant="info" onClick={() => handlePlay(art)}>
-                      Play Audio Description
-                    </Button>
-                    <Button variant="secondary" onClick={handleStop}>
-                      Stop Audio
-                    </Button>
-                  </div>
-                    
-                </Card.Body>
-                <Card.Footer className="bg-white border-0">
+                             
+              <div className="mt-auto" />
+
+              <div className="d-flex  justify-content-between mt-3">
+              <Button variant="info" onClick={() => handlePlay(art)}>
+                Play Audio Description
+              </Button>
+              <Button variant="secondary" onClick={handleStop}>
+                Stop Audio
+              </Button>
+              </div>   
+              </Card.Body>
+                <Card.Footer className=" border-1">
                   <div className="d-flex justify-content-between">
                     <Button variant="warning" onClick={() => handleModify(art.id_art)}>
                       Modify
