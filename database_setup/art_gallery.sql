@@ -7,6 +7,6 @@ CREATE TABLE art_gallery (
     style        VARCHAR2(50) CHECK (style IN ('Impressionism', 'Realism', 'Romanticism', 'Surrealism')),
     image_blob   BLOB,
     signature    VARCHAR2(16),
-    embedding    CLOB,
+    embedding    JSON,
     upload_date  DATE DEFAULT SYSDATE
 );

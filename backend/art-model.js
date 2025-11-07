@@ -13,7 +13,7 @@ export const ArtSchema = new EntitySchema({
     style: { type: 'varchar', length: 50 },
     image_blob: { type: 'blob', nullable: true },
     signature: { type: 'varchar', length: 16, nullable: true },
-    embedding: { type: 'clob', nullable: true },
+    embedding: { type: 'json', nullable: true },
     upload_date: { type: 'date', default: () => 'SYSDATE' },
   }
 });

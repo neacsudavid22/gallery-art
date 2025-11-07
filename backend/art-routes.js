@@ -2,7 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import { AppDataSource } from './db-connection.js';
 
-const upload = multer({ storage: multer.memoryStorage() }); // fișier în memorie
+const upload = multer({ storage: multer.memoryStorage() });
 const artRouter = express.Router();
 
 // Repository
@@ -12,20 +12,31 @@ const getArtRepo = () => AppDataSource.getRepository('Art');
 artRouter.post('/', upload.single('image_blob'), async (req, res) => {
   try {
     const { title, description, style, author, year } = req.body;
-    const image_blob = req.file ? req.file.buffer : null;
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'Image file is required.' });
+    }
+
+    const buffer = req.file.buffer;
 
     const repo = getArtRepo();
+
     const newArt = repo.create({ 
       title, 
       description, 
       style, 
       author, 
       year: year ? parseInt(year) : null,
-      image_blob 
+      image_blob: buffer,    
     });
+    
     const savedArt = await repo.save(newArt);
 
-    res.status(201).json(savedArt);
+    res.status(201).json({
+      ...savedArt,
+      image_blob: savedArt.image_blob ? savedArt.image_blob.toString('base64') : null
+    });
+    
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
@@ -79,7 +90,6 @@ artRouter.get('/:id', async (req, res) => {
   }
 });
 
-
 // UPDATE
 artRouter.put('/:id', upload.single('image_blob'), async (req, res) => {
   try {
@@ -94,7 +104,11 @@ artRouter.put('/:id', upload.single('image_blob'), async (req, res) => {
     if (style) art.style = style;
     if (author) art.author = author;
     if (year) art.year = parseInt(year);
-    if (req.file) art.image_blob = req.file.buffer;
+
+
+    if (req.file) {
+      art.image_blob = req.file.buffer;;
+    }
 
     const updatedArt = await repo.save(art);
 
@@ -107,8 +121,6 @@ artRouter.put('/:id', upload.single('image_blob'), async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-
 
 // DELETE
 artRouter.delete('/:id', async (req, res) => {
