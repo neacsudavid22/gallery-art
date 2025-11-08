@@ -8,7 +8,7 @@ export const ArtSchema = new EntitySchema({
     id_art: { primary: true, type: 'number', generated: true },
     title: { type: 'varchar', length: 255 },
     author: { type: 'varchar', length: 255 },
-    year: { type: 'number', nullable: true },
+    year: { type: 'int', nullable: true },
     description: { type: 'clob', nullable: true },
     style: { type: 'varchar', length: 50 },
     image_blob: { type: 'blob', nullable: true },
