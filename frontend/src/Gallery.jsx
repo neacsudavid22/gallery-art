@@ -1,5 +1,6 @@
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import SearchBar from './SearchBar';
 
 const Gallery = () => {
     const navigate = useNavigate();
@@ -17,8 +18,9 @@ const Gallery = () => {
 
     return (
         <Container className="my-5">
+            <SearchBar />
             <h2 className="text-center mb-5 display-4">Art Gallery by Movements</h2>
-
+            
             <Row xs={1} md={2} lg={4} className="g-4">
                 {folders.map((folder, index) => (
                     <Col key={index}>
