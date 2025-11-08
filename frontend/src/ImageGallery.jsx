@@ -86,6 +86,7 @@ const handleStop = () => {
                   variant="top"
                   src={`data:image/jpeg;base64,${art.image_blob}`}
                   style={{ objectFit: 'cover', height: '300px' }}
+                  onClick={()=>navigate('/art/' + art.id_art)}
                 />
               )}
                 <Card.Body className="flex-grow-1 d-flex flex-column">
