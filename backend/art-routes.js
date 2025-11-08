@@ -2,8 +2,7 @@ import express from 'express';
 import { AppDataSource } from './db-connection.js';
 import { generateAudio } from './openai.js';
 import multer from "multer";
-import fs from 'fs';
-import path from 'path';
+
 
 const upload = multer({ storage: multer.memoryStorage() });
 const artRouter = express.Router();
@@ -19,10 +18,6 @@ artRouter.post('/', upload.single('image_blob'), generateAudio, async (req, res)
 
     const repo = getArtRepo();
 
-    const tempFilePath = path.join('./tmp', `audio_${Date.now()}.mp3`);
-    fs.writeFileSync(tempFilePath, req.audio_blob);
-    const readBuffer = fs.readFileSync(tempFilePath);
-
     const newArt = repo.create({
       title,
       description,
@@ -30,7 +25,7 @@ artRouter.post('/', upload.single('image_blob'), generateAudio, async (req, res)
       author,
       year: year ? parseInt(year) : 1000,
       image_blob: buffer,
-      audio_blob: readBuffer,
+      audio_blob: req.audio_blob,
     });
 
     const savedArt = await repo.save(newArt);
