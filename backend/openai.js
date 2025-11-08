@@ -1,18 +1,27 @@
+// middleware/generateAudio.js
 import OpenAI from "openai";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-const textToAudioBuffer = async (text) => {
-  const response = await openai.audio.speech.create({
-    model: "gpt-4o-mini-tts",
-    voice: "alloy",
-    input: text,
-  });
+export const generateAudio = async (req, res, next) => {
+  try {
+    const description = req.body.description || 'No description provided';
 
-  const arrayBuffer = await response.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
+    const response = await openai.audio.speech.create({
+      model: "gpt-4o-mini-tts",
+      voice: "alloy",
+      input: description,
+    });
 
-  return buffer; 
-}
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
-export { textToAudioBuffer }
+    req.audio_blob = buffer;
+    req.audio_mime = "audio/mpeg"; 
+
+    next(); 
+  } catch (error) {
+    console.error("Audio generation failed:", error);
+    return res.status(500).json({ error: "Failed to generate audio description." });
+  }
+};
