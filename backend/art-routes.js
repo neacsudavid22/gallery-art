@@ -2,6 +2,8 @@ import express from 'express';
 import { AppDataSource } from './db-connection.js';
 import { generateAudio } from './openai.js';
 import multer from "multer";
+import fs from 'fs';
+import path from 'path';
 
 const upload = multer({ storage: multer.memoryStorage() });
 const artRouter = express.Router();
@@ -17,6 +19,10 @@ artRouter.post('/', upload.single('image_blob'), generateAudio, async (req, res)
 
     const repo = getArtRepo();
 
+    const tempFilePath = path.join('./tmp', `audio_${Date.now()}.mp3`);
+    fs.writeFileSync(tempFilePath, req.audio_blob);
+    const readBuffer = fs.readFileSync(tempFilePath);
+
     const newArt = repo.create({
       title,
       description,
@@ -24,7 +30,7 @@ artRouter.post('/', upload.single('image_blob'), generateAudio, async (req, res)
       author,
       year: year ? parseInt(year) : 1000,
       image_blob: buffer,
-      audio_blob: req.audio_blob,
+      audio_blob: readBuffer,
     });
 
     const savedArt = await repo.save(newArt);
@@ -58,7 +64,7 @@ artRouter.put('/:id', upload.single('image_blob'), generateAudio, async (req, re
       art.image_blob = buffer;
     }
 
-    if(req.audio_blob) {
+    if(req.audio_blob instanceof Buffer){ 
       art.audio_blob = req.audio_blob;
     }
 
@@ -78,7 +84,7 @@ artRouter.get('/', async (req, res) => {
     const artsWithBase64 = arts.map(a => ({
       ...a,
       image_blob: a.image_blob ? a.image_blob.toString('base64') : null,
-      audio_blob: a.audio_blob ? a.audio_blob.toString('base64') : null, // <-- add this
+      audio_blob: a.audio_blob ? a.audio_blob.toString('base64') : null
     }));
     res.json(artsWithBase64);
   } catch (err) {
@@ -86,6 +92,34 @@ artRouter.get('/', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// READ SOME
+artRouter.get('/search', async (req, res) => {
+  try {
+    const { qtitle } = req.query;
+    if (!qtitle) return res.status(400).json({ error: 'Missing query parameter qtitle' });
+
+    const arts = await getArtRepo()
+      .createQueryBuilder('art')
+      .where('LOWER(art.title) LIKE :title', { title: `%${qtitle.toLowerCase()}%` })
+      .getMany();
+
+      console.log(arts[0].audio_blob);
+      console.log(arts[0].image_blob);
+
+      const artsWithBase64 = arts.map(a => ({
+        ...a,
+        image_blob: a.image_blob ? a.image_blob.toString('base64') : null,
+        audio_blob: a.audio_blob ? a.audio_blob.toString('base64') : null
+      }));
+      res.json(artsWithBase64);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 // READ ONE
 artRouter.get('/:id', async (req, res) => {

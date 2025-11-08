@@ -8,12 +8,18 @@ import { useNavigate } from 'react-router-dom';
 
 const SearchBar = () => {
   const navigate = useNavigate();
-  const [artId, setArtId] = useState('');
+  const [artSearch, setArtSearch] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (artId.trim() !== '') {
-      navigate(`/art/${artId}`);
+    const searchValue = artSearch.trim();
+
+    if (!searchValue) return; 
+
+    if (!isNaN(searchValue) && Number.isInteger(Number(searchValue))) {
+      navigate(`/art/${searchValue}`);
+    } else {
+      navigate(`/collection/art/${encodeURIComponent(searchValue)}`);
     }
   };
 
@@ -23,10 +29,10 @@ const SearchBar = () => {
         <Row className="align-items-center g-1">
           <Col xs={8}>
             <Form.Control
-              type="number"
-              placeholder="Enter artwork ID..."
-              value={artId}
-              onChange={(e) => setArtId(e.target.value)}
+              type="text"
+              placeholder="Enter artwork ID or title..."
+              value={artSearch}
+              onChange={(e) => setArtSearch(e.target.value)}
               className="rounded-2 px-3 py-1 fs-6"
             />
           </Col>

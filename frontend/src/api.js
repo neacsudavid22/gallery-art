@@ -1,6 +1,5 @@
 const BASE_URL = import.meta.env.VITE_API_URL + '/api/art';
 
-// Get all artworks by style
 export const getArtByStyle = async (style) => {
   const res = await fetch(`${BASE_URL}/style/${style}`,{
     credentials: 'include',
@@ -9,7 +8,6 @@ export const getArtByStyle = async (style) => {
   return await res.json();
 };
 
-// Get one artwork by id
 export const getArtById = async (id) => {
   const res = await fetch(`${BASE_URL}/${id}`,{
     credentials: 'include',
@@ -18,7 +16,14 @@ export const getArtById = async (id) => {
   return await res.json();
 };
 
-// Create new artwork (with image)
+export const getArtByTitle = async (title) => {
+  const res = await fetch(`${BASE_URL}/search?qtitle=${title}`,{
+    credentials: 'include',
+    method: 'GET',
+  });
+  return await res.json();
+};
+
 export const createArt = async (formData) => {
   const res = await fetch(BASE_URL, {
     method: 'POST',
@@ -28,7 +33,6 @@ export const createArt = async (formData) => {
   return await res.json();
 };
 
-// Update existing artwork
 export const updateArt = async (id, formData) => {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: 'PUT',
@@ -39,7 +43,6 @@ export const updateArt = async (id, formData) => {
 };
    
 
-// Delete artwork
 export const deleteArt = async (id) => {
   const res = await fetch(`${BASE_URL}/${id}`, { 
     method: 'DELETE', 

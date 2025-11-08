@@ -1,24 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Button, Stack } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getArtByStyle, deleteArt } from './api'; 
+import { getArtByStyle, deleteArt, getArtByTitle } from './api'; 
 
 const ImageGallery = () => {
   const { style } = useParams();
+  const { title } = useParams();
   const navigate = useNavigate();
   const [images, setImages] = useState([]);
 
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const arts = await getArtByStyle(style);
+        const arts = style ? await getArtByStyle(style) : await getArtByTitle(title);
         setImages(arts);
       } catch (err) {
         console.error('Error fetching images:', err);
       }
     };
     fetchImages();
-  }, [style]);
+  }, [style, title]);
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this artwork?')) {

@@ -14,6 +14,7 @@ function App() {
           <Route path="/add-photo" element={<ImageForm />} />
           <Route path="/add-photo/:id" element={<ImageForm />} />
           <Route path="/collection/:style" element={<ImageGalleryPage />} />
+          <Route path="/collection/art/:title" element={<ImageGalleryPage />} />
           <Route path="/art/:id" element={<ImageDetails />} />
         </Routes>
     </BrowserRouter>
